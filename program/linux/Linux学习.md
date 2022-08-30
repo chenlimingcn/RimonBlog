@@ -67,6 +67,8 @@ errno: 函数调用的常见错误码
 ### 4.3 Linux网络编程
 
 Linux网络编程.pdf
+socket编程接口
+基于TCP的协议设计
 
 ### 4.4 Linux程序调试
 
