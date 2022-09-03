@@ -36,6 +36,167 @@ man: 不懂就问男人，不要永远只会百度，你出现的问题别人不
 
 ![image-20220829231501711](man.png)
 
+### 3.1 常用命令
+
+(0) 一般命令
+
+```bash
+man
+echo 
+date
+exit
+clear
+alias
+```
+
+
+
+(1) 文件系统
+
+```bash
+ls
+find
+cd
+cp
+mv
+mkdir
+rm
+rmdir
+touch
+dd
+chmod
+chown
+chgrp
+mount
+unmount
+ln
+tar
+zip
+unzip
+xz
+sync
+```
+
+(2) 文本处理
+
+```bash
+cat
+grep
+head
+tail
+more
+less
+wc
+diff
+```
+
+(3) 进程相关
+
+```bash
+top
+ps
+pstree
+kill
+killall
+pkill
+```
+
+(4) 账户管理
+
+```bash
+w
+who
+whoami
+adduser
+deluser
+groupadd
+groupdel
+passwd
+su
+sudo
+last
+```
+
+(5) 网络相关
+
+```bash
+ifconfig
+ip
+ping
+netstat
+telnet
+route
+ssh
+scp
+ftp
+wget
+curl
+```
+
+(6) 软件安装
+
+```bash
+apt
+snap
+dpkg
+```
+
+
+
+(7) 内核相关
+
+```bash
+dmesg
+uname
+insmod
+lsmod
+rmmod
+modinfo
+```
+
+
+
+### 3.2 基本shell
+
+```bash
+if [ condition ]; then
+	# 条件真的脚本
+fi
+```
+
+```bash
+if [ condition1 ]; then
+	# scripts
+elif [ condition2 ]; then
+	# scripts
+else
+	# scripts
+fi
+```
+
+```bash
+while [ condition ]
+do
+	# scripts
+done
+```
+
+```bash
+until [ condition ]
+do
+     # scripts
+done
+```
+
+```bash
+for var in con1 con2 con3 ..
+do
+	# scripts
+done
+```
+
+
+
 ## 4 Linux编程
 
 ### 4.1 Linux编程环境准备
@@ -58,15 +219,12 @@ project.pro
 
 ### 4.2 Linux系统API编程
 
-Linux系统编程.pdf
-
 errno: 函数调用的常见错误码
 
 守护进程编写（促使你去了解文件描述符、标准输入输出、错误输出、fork、进程、进程树、会话、工作目录等概念）
 
 ### 4.3 Linux网络编程
 
-Linux网络编程.pdf
 socket编程接口
 基于TCP的协议设计
 
@@ -84,11 +242,214 @@ socket编程接口
 | -O3    | 在O2的基础上进行更多的优化，例如使用伪寄存器网络，普通函数的内联，以及针对循环的更多优化。 |
 | -Os    | 主要是对代码大小的优化，我们基本不用做更多的关心。 通常各种优化都会打乱程序的结构，让调试工作变得无从着手。并且会打乱执行顺序，依赖内存操作顺序的程序需要做相关处理才能确保程序的正确性。 |
 
+(1) 示例1 类型不一致
+
+```c
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+
+typedef struct USER_DATA{
+        char data[32];
+        unsigned short data_len;
+        unsigned int flag;
+}__attribute((packed))__;
+
+const char *    g_data =  "hello";
+
+static int get_data(char *data, unsigned int *len)
+{
+        assert(data && len);
+        memcpy((void *)data, (void *)g_data, strlen(g_data));
+        *len = strlen(g_data);
+        return 0;
+}
+
+int main(int argc, char *argv[])
+{
+        struct USER_DATA user_data;
+        user_data.flag = 0xA5;
+
+        if (0 == get_data(user_data.data, &user_data.data_len))
+        {
+                printf("get_data ok! \n");
+                printf("data_len = %d, data = %s \n", user_data.data_len, user_data.data);
+                printf("user_data.flag = 0x%x \n", user_data.flag);
+        }
+        else
+        {
+                printf("get_data failed! \n");
+        }
+        return 0;
+}
+
+```
+
+调试方法：断点逐步运行
+
 启动gdb如下：
 
 ```bash
 gdb ./cgdbtest
 ```
+
+(2) 示例2 空指针
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+int main(int argc, char* argv[])
+{
+    int* pValue = NULL;
+    *pValue = 0;
+    
+    return 0;
+}
+```
+
+调试方法：gdb直接运行，看堆栈
+
+```bash
+~/rimon/study/linux/gdb $ gdb ./nulltest
+GNU gdb (Ubuntu 9.2-0ubuntu1~20.04.1) 9.2
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./nulltest...
+(gdb) r
+Starting program: /home/rimon/rimon/study/linux/gdb/nulltest
+
+Program received signal SIGSEGV, Segmentation fault.
+0x0000555555555144 in main (argc=1, argv=0x7fffffffe1f8) at nulltest.c:7
+7           *pValue = 0;
+(gdb) where
+#0  0x0000555555555144 in main (argc=1, argv=0x7fffffffe1f8) at nulltest.c:7
+(gdb)
+```
+
+
+
+(3) 示例3 多线程
+
+```cpp
+#include <pthread.h>
+#include <stdio.h>
+#include <string>
+
+#include <unistd.h>
+
+void pushChar2Str(std::string &str, char ch)
+{
+        str.push_back(ch);
+}
+
+void* thdFun(void* arg)
+{
+        std::string *str = (std::string*)arg;
+        while (true)
+        {
+                pushChar2Str(*str, 'T');
+        }
+
+        return arg;
+}
+
+int main(int argc, char* argv[])
+{
+        std::string str;
+
+        pthread_t tid;
+        pthread_create(&tid, NULL, thdFun, (void*)&str);
+
+        while (true)
+        {
+                pushChar2Str(str, 'M');
+                sleep(1);
+        }
+        return 0;
+}
+```
+
+调试方法：ulimit -c unlimited 后直接运行，然后使用以下命令加载coredump：
+
+```bash
+gdb ./multithread /var/lib/apport/coredump/core._home_rimon_rimon_study_linux_gdb_multithread.1000.fe100adf-b51f-4987-be8e-06967551e929.3632.1378613
+```
+
+
+
+coredump文件可以生成位置由 ***/proc/sys/kernel/core_pattern\***文件指定。一般coredump文件要么在当前目录，要么在/var/lib/apport/coredump下
+
+```bash
+~/rimon/study/linux/gdb $ gdb ./multithread /var/lib/apport/coredump/core._home_rimon_rimon_study_linux_gdb_multithread.1000.fe100adf-b51f-4987-be8e-06967551e929.3632.1378613
+GNU gdb (Ubuntu 9.2-0ubuntu1~20.04.1) 9.2
+Copyright (C) 2020 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+Type "show copying" and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
+
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./multithread...
+[New LWP 3632]
+[New LWP 3633]
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+Core was generated by `./multithread'.
+Program terminated with signal SIGSEGV, Segmentation fault.
+#0  __memmove_avx_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:497
+497     ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S: No such file or directory.
+[Current thread is 1 (Thread 0x7f66e2c2e740 (LWP 3632))]
+(gdb) where
+#0  __memmove_avx_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:497
+#1  0x00007f66e30f537e in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#2  0x00007f66e30f5b85 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::push_back(char) ()
+   from /lib/x86_64-linux-gnu/libstdc++.so.6
+#3  0x000055807ec0b210 in pushChar2Str (str=<error: Cannot access memory at address 0x7f66a1dfb010>, ch=77 'M') at multithread.cpp:9
+#4  0x000055807ec0b29d in main (argc=1, argv=0x7fffa92e15a8) at multithread.cpp:32
+(gdb) info thread
+  Id   Target Id                        Frame
+* 1    Thread 0x7f66e2c2e740 (LWP 3632) __memmove_avx_unaligned_erms () at ../sysdeps/x86_64/multiarch/memmove-vec-unaligned-erms.S:497
+  2    Thread 0x7f66e2c2d700 (LWP 3633) 0x00007f66e2e9a97b in munmap () at ../sysdeps/unix/syscall-template.S:78
+  (gdb) thread 2
+[Switching to thread 2 (Thread 0x7f66e2c2d700 (LWP 3633))]
+#0  0x00007f66e2e9a97b in munmap () at ../sysdeps/unix/syscall-template.S:78
+78      ../sysdeps/unix/syscall-template.S: No such file or directory.
+(gdb) where
+#0  0x00007f66e2e9a97b in munmap () at ../sysdeps/unix/syscall-template.S:78
+#1  0x00007f66e30f53d8 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#2  0x00007f66e30f5b85 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::push_back(char) ()
+   from /lib/x86_64-linux-gnu/libstdc++.so.6
+#3  0x000055807ec0b210 in pushChar2Str (str=<error: Cannot access memory at address 0x7f66a1dfb010>, ch=84 'T') at multithread.cpp:9
+#4  0x000055807ec0b23c in thdFun (arg=0x7fffa92e1470) at multithread.cpp:17
+#5  0x00007f66e2f7c609 in start_thread (arg=<optimized out>) at pthread_create.c:477
+#6  0x00007f66e2ea1133 in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:95
+(gdb)
+
+```
+
+(4) 示例4 handle特殊处理信息（主要针对接收系统信号的程序)
 
 
 
@@ -101,6 +462,10 @@ gdb ./cgdbtest
 | b 行号<br />b 文件名:行号 | 在指定文件的对应行设置断点                                   |
 | disable 数字              | 禁用info b 对应编号的断点                                    |
 | enable 数字               | 启动info b 对应编号的断点                                    |
+| where                     | 查看堆栈                                                     |
+| frame 数字                | 根据where输出前面的编号，定位到指定的调用栈                  |
+| thread 数字               | 切换到指定的线程号，线程号通过info thread                    |
+| handle                    | 指定信号的动作                                               |
 
 
 
@@ -137,19 +502,113 @@ cgdb ./cgdbtest
 
 
 
-远程gdb+vscode
+#### 4.4.3 远程gdb+vscode
 
-ulimit -c unlimited
 
-善于使用proc/sys虚拟文件系统获取信息
 
-查看/var/log下面相关的log
+#### 4.4.4 通过proc或者sys调试
 
-demsg
+#### 4.4. 5 查看/var/log下面相关的log
+
+#### 4.4.6 demsg
 
 ### 4.5 Linux驱动程序了解
 
 虽然不一定要写驱动，稍微了解一下框架有助于理解Linux的一些概念，便于定位问题
+
+源码如下：
+
+```c
+#include <linux/module.h>
+#include <linux/kernel.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+
+static struct cdev *chr_dev;
+static dev_t ndev;
+
+static int chr_open(struct inode* nd, struct file* filp)
+{
+        int major ;
+        int minor;
+
+        major = MAJOR(nd->i_rdev);
+        minor = MINOR(nd->i_rdev);
+
+        printk("chr_open, major = %d, minor = %d\n", major, minor);
+        return 0;
+}
+
+static ssize_t chr_read(struct file* filp, char __user* u, size_t sz, loff_t* off)
+{
+        printk("chr_read process!\n");
+        return 0;
+}
+
+struct file_operations chr_ops = {
+        .owner = THIS_MODULE,
+        .open = chr_open,
+        .read = chr_read
+};
+
+static int demo_init(void)
+{
+        int ret;
+
+        chr_dev = cdev_alloc();
+        cdev_init(chr_dev, &chr_ops);
+        ret = alloc_chrdev_region(&ndev, 0, 1, "chrdev");
+        //ret = register_chrdev_region(ndev, 1, "chrdev");
+        if(ret < 0 )
+        {
+                printk("alloc_chrdev_region error\n");
+                return ret;
+        }
+
+        printk("demo_init(): major = %d, minor = %d\n", MAJOR(ndev), MINOR(ndev));
+        ret = cdev_add(chr_dev, ndev, 1);
+        if(ret < 0)
+        {
+                printk("cdev_add error\n");
+                return ret;
+        }
+        //mknod("/dev/chrdev", 0755, ndev);
+        return 0;
+}
+
+static void demo_exit(void)
+{
+        printk("demo_exit process!\n");
+        cdev_del(chr_dev);
+        unregister_chrdev_region(ndev, 1);
+}
+
+module_init(demo_init);
+module_exit(demo_exit);
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("feixiaoxing@163.com");
+MODULE_DESCRIPTION("A simple device example!");
+```
+
+相应的Makefile
+
+```makefile
+ifneq ($(KERNELRELEASE),)
+obj-m := chrdev.o
+
+else
+PWD  := $(shell pwd)
+KVER := $(shell uname -r)
+KDIR := /lib/modules/$(KVER)/build
+all:
+        $(MAKE) -C $(KDIR) M=$(PWD) modules
+clean:
+        rm -rf .*.cmd *.o *.mod.c *.ko .tmp_versions modules.*  Module.*
+endif
+```
+
+
 
 ### 4.6 Linux源码阅读
 
@@ -465,6 +924,16 @@ drwxr-xr-x    4 root     root           200 Oct 22  2020 var
 
 
 ```
+
+## 参考文档
+
+鸟哥 Linux 私房菜：基础版
+
+Linux系统编程 第2版_(美)RobertLove;祝洪凯李妹芳付途译
+
+linux网络编程_ Linux典藏大系(宋敬彬、孙海滨) 
+
+Linux设备驱动开发详解：基于最新的Linux 4.0内核
 
 
 
