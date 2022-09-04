@@ -30,7 +30,7 @@ vim(配合nerdtree插件)
 
 ## 3 Linux Shell
 
-鸟哥 Linux 私房菜：基础版.pdf
+鸟哥 Linux 私房菜：基础版
 
 man: 不懂就问男人，不要永远只会百度，你出现的问题别人不一定遇到，别人遇到解决后也不一定发到网上，哪怕发到网上的也不一定解释全面，man帮助手册是最全最权威性的资料
 
@@ -152,6 +152,9 @@ insmod
 lsmod
 rmmod
 modinfo
+modprobe
+depmod
+
 ```
 
 
@@ -451,7 +454,66 @@ Program terminated with signal SIGSEGV, Segmentation fault.
 
 (4) 示例4 handle特殊处理信息（主要针对接收系统信号的程序)
 
+```bash
+#include <stdio.h>
 
+#include <signal.h>
+
+static int g_running = 1;
+
+void onSigint(int signo)
+{
+	printf("signo: %d\n", signo);
+	int v1 = 0xFFFFFF;
+	short v2 = v1;
+	printf("v2: %d\n", v2);
+	printf("Ctrl + c\n");
+	g_running = 0;
+}
+
+int main(int argc, char* argv)
+{
+	signal(SIGINT, onSigint);
+	
+	int space = 10;
+	g_running = 1;
+	while (g_running)
+	{
+		for (int i = 0; i < space; ++i)
+		{
+			printf(" ");
+			usleep(20000);
+		}
+		for (int i = 0; i < 2 * (10 - space); ++i)
+		{
+			printf(".");
+			usleep(10000);
+		}
+		printf(".");
+		for (int i = 0; i < space; ++i)
+		{
+			printf(" ");
+			usleep(20000);
+		}
+		printf("\n");
+		--space;
+		sleep(1);
+		if (space < 0)
+		{
+			space = 10;
+		}
+	}
+	
+	return 0;
+}
+
+```
+
+进入gdb命令后，输入以下指令:
+
+```
+handle SIGINT nostop pass
+```
 
 常用命令：
 
@@ -504,13 +566,28 @@ cgdb ./cgdbtest
 
 #### 4.4.3 远程gdb+vscode
 
+(略)
+
+#### 4.4.4 通过proc查看进程状态
+
+(1) proc常用文件及作用
+
+| 文件（夹）路径     | 文件（夹）内容                                               |
+| ------------------ | ------------------------------------------------------------ |
+| /proc/self/cmdline | 进程启动的命令行                                             |
+| /proc/self/cwd     | 当前工作目录                                                 |
+| /proc/self/task    | 此目录包含当前进程的线程对应id，与进程号相同的id即为主线程   |
+| /proc/1206/fd      | 此目录下包含所有打开的文件描述符的软链接，指向实际打开的文件/socket |
 
 
-#### 4.4.4 通过proc或者sys调试
 
-#### 4.4. 5 查看/var/log下面相关的log
+#### 4.4.5 查看/var/log下面相关的log
+
+（略）
 
 #### 4.4.6 demsg
+
+（略）
 
 ### 4.5 Linux驱动程序了解
 
