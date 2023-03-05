@@ -8,7 +8,7 @@
 
 (1) 有比较全的软件仓库(APT)，同时输入命令时如果未安装会提示安装的软件包(yum就没那么智能)
 
-​    ![image-20220829224929388](apt智能提示.png)
+​    ![image-20220829224929388](Linux学习指引.md.res/apt智能提示.png)
 
 (2) 相对易用的软件界面（作为入门还是可以的，后面慢慢需要摆脱出来）
 
@@ -16,7 +16,7 @@
 
 (3) 基于标准内核之上的相对独立的修改（而不是魔改版本，如雨林木风OS)
 
-![image-20220829224929388](linux内核源码目录.png)
+![image-20220829224929388](Linux学习指引.md.res/linux内核源码目录.png)
 
 (4) 完善的论坛、社区（不要永远只会百度)      https://askubuntu.com/
 
@@ -34,7 +34,7 @@ vim(配合nerdtree插件)
 
 man: 不懂就问男人，不要永远只会百度，你出现的问题别人不一定遇到，别人遇到解决后也不一定发到网上，哪怕发到网上的也不一定解释全面，man帮助手册是最全最权威性的资料
 
-![image-20220829231501711](man.png)
+![image-20220829231501711](Linux学习指引.md.res/man.png)
 
 ### 3.1 常用命令
 
@@ -555,7 +555,7 @@ cgdb ./cgdbtest
 
 启动后界面如下：
 
-![image-20220830222326270](cgdb.png)
+![image-20220830222326270](Linux学习指引.md.res/cgdb.png)
 
 常用快捷键:
 
@@ -703,7 +703,7 @@ endif
 
 ### 4.6 Linux源码阅读
 
-![image-20220831220207880](linux-source-5.4.0.png)
+![image-20220831220207880](Linux学习指引.md.res/linux-source-5.4.0.png)
 
 ## 5 Linux交叉编译
 
@@ -756,7 +756,7 @@ make CROSS_COMPILE=arm-linux-gnueabihf- all
 
 
 
-![image-20220831210627999](uboot.png)
+![image-20220831210627999](Linux学习指引.md.res/uboot.png)
 
 ### 5.5 根文件系统制作
 
@@ -771,7 +771,7 @@ make menuconfig
 make
 ```
 
-![image-20220831212801939](buildroot.png)
+![image-20220831212801939](Linux学习指引.md.res/buildroot.png)
 
 我们主要配置以下项:
 
@@ -791,7 +791,7 @@ make ARCH=arm menuconfig
 
 如图界面：
 
-![image-20220831214021379](linuxmakemenu.png)
+![image-20220831214021379](Linux学习指引.md.res/linuxmakemenu.png)
 
 修改以下参数：
 
@@ -820,7 +820,7 @@ sudo umount /mnt
 
 (2) 把编译好的kernel zImage 和 dtb 文件拷贝到 sd.img 中
 
-![image-20220831214808637](sdcard.png)
+![image-20220831214808637](Linux学习指引.md.res/sdcard.png)
 
 制作完成后启动
 

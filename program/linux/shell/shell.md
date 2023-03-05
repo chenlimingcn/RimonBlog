@@ -41,7 +41,7 @@ cat /etc/shells
 
 ### 3.1 man手册种类
 
-![man手册种类](man_class.png)
+![man手册种类](shell.md.res/man_class.png)
 
 ### 3.2 
 
