@@ -81,8 +81,17 @@ sync
 
 ## 4.3 文本操作 
 
-cat
+### 4.3.1 文本三剑客awk sed grep
+
+awk
+
+sed
+
 grep
+
+
+
+cat
 head
 tail
 more

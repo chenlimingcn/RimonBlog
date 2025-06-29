@@ -144,7 +144,7 @@ gprof是GNU组织下的一个比较有用的性能测试功能：
 
 ```bash
 gprof  -b sysmgrsdktest  gmon.out >>report.txt
-python /home/rimon/rimon/study/unittest/gprof2dot-master/gprof2dot.py report.txt >>report.dot
+python /home/rimon/rimon/study/unittest/gprof2dot/gprof2dot.py report.txt >>report.dot
 dot report.dot -T png -o report.png # （命令行显示内存不足）
 ```
 
